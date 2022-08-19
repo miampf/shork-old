@@ -5,6 +5,9 @@ version = 3
 [[package]]
 name = "shork"
 version = "0.1.0"
+dependencies = [
+ "shork-error",
+]
 
 [[package]]
 name = "shork-error"
