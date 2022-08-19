@@ -11,3 +11,4 @@ Variables can easily be declared by writing ```varname = varvalue```, or ```varn
 | double  | Also a floating point number, but more precise.   |
 | char    | holds a single character. Uses only single quotes |
 | string  | holds a string of characters. Uses double quotes  |
+| boolean | contains either true or false                     |
