@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "error",
     "lexer",
     "shork-cli"
 ]
