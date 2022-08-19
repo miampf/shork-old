@@ -1,0 +1,15 @@
+reef examples
+
+get std::io
+
+define func_with_generic(param: T<integer|char>): T<string|char>{
+    return param
+}
+
+define example(){
+    n = 12
+    io.print("With number: $1", func_with_generic(n))
+
+    c = 'a'
+    io.print("With char: $1", func_with_generic(c))
+}
