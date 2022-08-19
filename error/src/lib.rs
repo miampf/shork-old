@@ -46,8 +46,8 @@ impl Display for ShorkError{
 
 impl Display for ErrorType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let to_print = match self {
-            &Self::SyntaxError => "Syntax Error"
+        let to_print = match *self {
+            Self::SyntaxError => "Syntax Error"
         };
         write!(f, "{}", to_print)
     }
