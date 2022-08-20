@@ -20,14 +20,12 @@ define sum(one: integer, two: integer): integer{
 }
 ```
 
-Generic types are also possible. A generic is indicated with a "T". If you want that generic to have specific traits, you can add attributes inside of "<>" parantheses.
+Generic types are also possible (well, not really, but they are similair). A generic is indicated with a "T" and have the variable types that they can represent written besides them in "<>".
 
 The same function but with generics could be:
 
 ```txt
-define sum(one: T<number>, two: T<number>): T<number>{
+define sum(one: T<integer|float>, two: T<integer|float>): T<integer|float>{
     return one + two
 }
 ```
-
-Here, "number" is an attribute that all numbers have (integers, doubles, floats, longs, etc.). For a guide on attributes, look into [Attributes]()
