@@ -14,6 +14,7 @@ pub trait Reporter{
 }
 
 /// Report an error to the stderr channel
+#[derive(Debug, Clone)]
 pub struct StderrReporter{
     errors: Vec<ShorkError>
 }
