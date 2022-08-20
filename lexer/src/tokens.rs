@@ -36,4 +36,24 @@ impl Token{
     pub fn new(t_type: TokenType, position: usize, length: usize, raw: Vec<u8>) -> Self{
         Self { t_type, position, length, raw }
     }
+
+    /// get the token type
+    pub fn token_type(&self) -> &TokenType{
+        &self.t_type
+    }
+
+    /// get the tokens position
+    pub fn position(&self) -> usize{
+        self.position
+    }
+
+    /// get the tokens length
+    pub fn len(&self) -> usize{
+        self.length
+    }
+
+    /// get the raw contents
+    pub fn raw(&self) -> &Vec<u8>{
+        &self.raw
+    }
 }
