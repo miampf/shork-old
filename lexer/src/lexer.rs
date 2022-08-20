@@ -291,6 +291,8 @@ impl<'a> Lexer<'a>{
 
     /// peek at the current head
     fn peek(&mut self) -> Result<char, shork_error::ShorkError>{
+        if self.current >= self.source.len() {return Ok('\0')}
+        
         let ch = self.source.chars().nth(self.current);
         if ch.is_some(){
             return Ok(ch.unwrap())
@@ -301,7 +303,7 @@ impl<'a> Lexer<'a>{
             shork_error::ErrorType::ReadingError,
              self.current, 
              self.source.clone(), 
-             "Couldn't read character at position".to_string());
+             format!("Couldn't read character at position {}", self.current));
         self.error_reporter.add_error(e.clone());
         Err(e)
     }
@@ -318,7 +320,7 @@ impl<'a> Lexer<'a>{
             shork_error::ErrorType::ReadingError,
              self.current+1, 
              self.source.clone(), 
-             "Couldn't read character at position".to_string());
+             format!("Couldn't read character at position {}", self.current+1));
         self.error_reporter.add_error(e.clone());
         Err(e)
     }
@@ -337,7 +339,7 @@ impl<'a> Lexer<'a>{
                 shork_error::ErrorType::ReadingError,
                  self.current-2, 
                  self.source.clone(), 
-                 "Couldn't read character at position".to_string());
+                 format!("Couldn't read character at position {}", self.current-2));
             self.error_reporter.add_error(e.clone());
             return Err(e)
         }
