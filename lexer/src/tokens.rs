@@ -4,15 +4,16 @@ pub enum TokenType{
     // single character stuff
     LeftParen, RightParen, LeftCurlyParen, RightCurlyParen,
     LeftSquareParen, RightSquareParen, Comma, Dot, Plus, Minus,
-    Slash, Asterisk, Pipe, AndSym, Roof, NewLine,
+    Asterisk, Pipe, AndSym, Roof, NewLine,
 
     // one or more characters
     Exclamation, ExclamationEqual, Equal, EqualEqual, Greater,
     GreaterEqual, GreaterGreater, Lesser, LesserEqual, LesserLesser,
+    Slash,
 
     // Type literals
-    Identifier, Integer, Long, Float, Double, Char, String, Boolean,
-    Regex, T,
+    Identifier, Integer, IntegerType, Float, FloatType, Char, CharType,
+    String, StringType, Boolean, BooleanType, Regex, RegexType, T,
 
     // Keywords
     Reef, Get, From, As, Define, And, Or, For, While, Do, In, If,
