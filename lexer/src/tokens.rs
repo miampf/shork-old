@@ -11,11 +11,11 @@ pub enum TokenType{
     GreaterEqual, GreaterGreater, Lesser, LesserEqual, LesserLesser,
     Slash,
 
-    // Type literals
+    // Type literals and type keywords
     Identifier, Integer, IntegerType, Float, FloatType, Char, CharType,
     String, StringType, Boolean, BooleanType, Regex, RegexType, T,
 
-    // Keywords
+    // general keywords
     Reef, Get, From, As, Define, And, Or, For, While, Do, In, If,
     Else, Return, Structure, Implement, Private,
 
