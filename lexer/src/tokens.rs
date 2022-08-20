@@ -1,5 +1,5 @@
 /// All different token types that can be found
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType{
     // single character stuff
     LeftParen, RightParen, LeftCurlyParen, RightCurlyParen,
@@ -23,7 +23,7 @@ pub enum TokenType{
 }
 
 /// A token in a shork program
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Token{
     t_type: TokenType,
     position: usize,
