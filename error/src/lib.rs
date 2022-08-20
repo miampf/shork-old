@@ -15,6 +15,7 @@ pub struct ShorkError{
 /// Different error types that can be thrown with a ShorkError
 #[derive(Copy, Clone, Debug)]
 pub enum ErrorType{
+    LexicalError,
     ReadingError,
     SyntaxError
 }
@@ -79,6 +80,7 @@ impl Display for ShorkError{
 impl Display for ErrorType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let to_print = match *self {
+            Self::LexicalError => "Lexical Error",
             Self::ReadingError => "Reading Error",
             Self::SyntaxError => "Syntax Error"
         };
