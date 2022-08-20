@@ -19,6 +19,37 @@ pub enum ErrorType{
     SyntaxError
 }
 
+impl ShorkError{
+    /// generate an error from a message and a given position in a source string
+    pub fn generate_error(e_type: ErrorType, position: usize, source: String, message: String) -> Self{
+        // get the line number of the error
+        let mut line = 0;
+        let mut pos_in_line = 0;
+        for i in 0..position{
+            pos_in_line += 1;
+            if source.chars().nth(i) == Some('\n'){
+                line += 1;
+                pos_in_line = 0;
+            }
+        }
+
+        let lines: Vec<&str> = source.lines().collect();
+        let line_content_untrimmed = lines[line];
+        let line_content = line_content_untrimmed.trim().to_string();
+        
+        pos_in_line -= line_content_untrimmed.len()-line_content.len();
+
+        // get the line content there
+        Self{
+            e_type,
+            line,
+            line_content,
+            pos_in_line,
+            message
+        }
+    }
+}
+
 impl Error for ShorkError{}
 
 impl Display for ShorkError{
