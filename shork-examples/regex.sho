@@ -4,6 +4,6 @@ get std::io
 
 define example(){
     s = "I am a squid!!!"
-    r = r"squid|fish|whale"
+    r = #squid|fish|whale#
     io.print("$1", r.replace(s, "shork"))
 }
