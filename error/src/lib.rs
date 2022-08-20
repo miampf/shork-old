@@ -17,7 +17,8 @@ pub struct ShorkError{
 pub enum ErrorType{
     LexicalError,
     ReadingError,
-    SyntaxError
+    SyntaxError,
+    TypeError,
 }
 
 impl ShorkError{
@@ -82,7 +83,8 @@ impl Display for ErrorType{
         let to_print = match *self {
             Self::LexicalError => "Lexical Error",
             Self::ReadingError => "Reading Error",
-            Self::SyntaxError => "Syntax Error"
+            Self::SyntaxError => "Syntax Error",
+            Self::TypeError => "Type Error"
         };
         write!(f, "{}", to_print)
     }
