@@ -3,12 +3,27 @@ use crate::ShorkError;
 
 /// A trait that must be implemented by all Error reporters
 pub trait Reporter{
-    /// Display the error you were given
+        /// Display the error you were given
     fn display_error(&self, e: ShorkError);
+
+    /// Add an error to the queue
+    fn add_error(&mut self, e: ShorkError);
+
+    /// Get all errors in the queue
+    fn get_errors(&self) -> &Vec<ShorkError>;
 }
 
 /// Report an error to the stderr channel
-pub struct StderrReporter{}
+pub struct StderrReporter{
+    errors: Vec<ShorkError>
+}
+
+impl StderrReporter{
+    /// create a new, empty reporter
+    pub fn new() -> Self{
+        Self { errors: Vec::new() }
+    }
+}
 
 impl Reporter for StderrReporter{
     fn display_error(&self, e: ShorkError) {
@@ -44,5 +59,13 @@ impl Reporter for StderrReporter{
                 println!("The error above was caused by this error message:\n{}", string)
             }
         }
+    }
+
+    fn add_error(&mut self, e: ShorkError) {
+        self.errors.push(e)
+    }
+
+    fn get_errors(&self) -> &Vec<ShorkError> {
+        &self.errors
     }
 }

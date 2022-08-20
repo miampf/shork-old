@@ -8,6 +8,6 @@ fn main() {
         pos_in_line: 5,
         message: "Expected ':'. Did you forget to add it after the variable name?".to_string()
     };
-    let reporter = StderrReporter{};
+    let reporter = StderrReporter::new();
     reporter.display_error(e);
 }
