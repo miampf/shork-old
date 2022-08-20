@@ -27,12 +27,12 @@ pub struct Token{
     t_type: TokenType,
     position: usize,
     length: usize,
-    raw: String
+    raw: Vec<u8>
 }
 
 impl Token{
     /// create a new token
-    pub fn new(t_type: TokenType, position: usize, length: usize, raw: String) -> Self{
+    pub fn new(t_type: TokenType, position: usize, length: usize, raw: Vec<u8>) -> Self{
         Self { t_type, position, length, raw }
     }
 }
