@@ -176,7 +176,7 @@ impl<'a> Lexer<'a>{
                     }
                 } else if ch.is_alphabetic() || ch == '_'{
                     // consume the whole identifier
-                    while self.peek()?.is_alphanumeric(){self.advance()?;}
+                    while self.peek()?.is_alphanumeric() || self.peek()? == '_'{self.advance()?;}
 
                     // check if it's a reserved keyword or not
                     let text = self.source[self.start..self.current].to_string();
@@ -205,6 +205,8 @@ impl<'a> Lexer<'a>{
                         "structure" => Some(Structure),
                         "implement" => Some(Implement),
                         "private" => Some(Private),
+                        "false" => Some(BooleanType),
+                        "true" => Some(BooleanType),
 
                         _ => None
                     };
@@ -292,7 +294,7 @@ impl<'a> Lexer<'a>{
     /// peek at the current head
     fn peek(&mut self) -> Result<char, shork_error::ShorkError>{
         if self.current >= self.source.len() {return Ok('\0')}
-        
+
         let ch = self.source.chars().nth(self.current);
         if ch.is_some(){
             return Ok(ch.unwrap())
