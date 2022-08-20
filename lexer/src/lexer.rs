@@ -140,7 +140,7 @@ impl<'a> Lexer<'a>{
 
                 let ch = self.peek_behind()?;
                 let mut is_important = false;
-                if ch.is_alphabetic() || ch.is_digit(10) || ch == ']' || ch == ')' || ch == '_'{
+                if ch.is_alphabetic() || ch.is_digit(10) || ch == ']' || ch == ')' || ch == '_' || ch == '#'{
                     is_important = true
                 }
 
