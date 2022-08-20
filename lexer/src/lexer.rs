@@ -1,3 +1,5 @@
+use std::num::{ParseIntError, ParseFloatError};
+
 use shork_error::report;
 use crate::tokens;
 
@@ -226,11 +228,63 @@ impl<'a> Lexer<'a>{
         }?;
 
         if t_type.is_some(){
+            let t_type = t_type.unwrap();
+            let mut raw_string = self.source[self.start..self.current].to_string();
+
+            if t_type == StringType{
+                // we can safely unwrap here (hopefully)
+                raw_string = raw_string.strip_prefix("\"").unwrap().strip_suffix("\"").unwrap().to_string();
+            } else if t_type == RegexType{
+                // here, too, we can safely unwrap (hopefully)
+                raw_string = raw_string.strip_prefix("#").unwrap().strip_suffix("#").unwrap().to_string();
+            }
+
+            let raw;
+            if t_type == IntegerType{
+                // parse the string as an integer
+                let n: Result<isize, ParseIntError> = raw_string.parse();
+                if n.is_err(){
+                    let e = shork_error::ShorkError::generate_error(
+                        shork_error::ErrorType::InterpreterError,
+                        self.current,
+                        self.source.clone(),
+                        format!("Interpreter failed while parsing the number: {}", n.unwrap_err()));
+                    self.error_reporter.add_error(e.clone());
+                    return Err(e);
+                }
+
+                // convert to bytes
+                raw = n.unwrap().to_ne_bytes().to_vec();
+            } else if t_type == FloatType{
+                // parse the string as a float
+                let n: Result<f64, ParseFloatError> = raw_string.parse();
+                if n.is_err(){
+                    let e = shork_error::ShorkError::generate_error(
+                        shork_error::ErrorType::InterpreterError,
+                        self.current,
+                        self.source.clone(),
+                        format!("Interpreter failed while parsing the number: {}", n.unwrap_err()));
+                    self.error_reporter.add_error(e.clone());
+                    return Err(e);
+                }
+
+                // convert to bytes
+                raw = n.unwrap().to_ne_bytes().to_vec();
+            } else if t_type == BooleanType{
+                if raw_string == "true"{
+                    raw = vec![1]
+                } else {
+                    raw = vec![0]
+                }
+            } else {
+                raw = raw_string.as_bytes().to_vec();
+            }
+
             return Ok(Some(tokens::Token::new(
-            t_type.unwrap(), 
+            t_type, 
             self.start, 
-            self.source[self.start..self.current].len(), 
-            self.source[self.start..self.current].as_bytes().to_vec())))
+            raw.len(), 
+            raw)))
         }
         return Ok(None)
     }
