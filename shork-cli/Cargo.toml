@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 shork-error = {path = "../error"}
+shork-lexer = {path = "../lexer"}
