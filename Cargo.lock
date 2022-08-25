@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "colorful"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bca1619ff57dd7a56b58a8e25ef4199f123e78e503fe1653410350a1b98ae65"
+
+[[package]]
 name = "shork"
 version = "0.1.0"
 dependencies = [
@@ -13,6 +19,9 @@ dependencies = [
 [[package]]
 name = "shork-error"
 version = "0.1.0"
+dependencies = [
+ "colorful",
+]
 
 [[package]]
 name = "shork-lexer"

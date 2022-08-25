@@ -1,6 +1,7 @@
 pub mod report;
 
 use std::{fmt::Display, error::Error};
+use colorful::{Color, Colorful};
 
 /// All errors go back to this struct
 #[derive(Clone, Debug)]
@@ -15,6 +16,7 @@ pub struct ShorkError{
 /// Different error types that can be thrown with a ShorkError
 #[derive(Copy, Clone, Debug)]
 pub enum ErrorType{
+    Warning,
     InterpreterError,
     LexicalError,
     ReadingError,
@@ -27,20 +29,18 @@ impl ShorkError{
     pub fn generate_error(e_type: ErrorType, position: usize, source: String, message: String) -> Self{
         // get the line number of the error
         let mut line = 0;
-        let mut pos_in_line = 0;
+        let mut pos_in_line = 1;
         for i in 0..position{
             pos_in_line += 1;
             if source.chars().nth(i) == Some('\n'){
                 line += 1;
-                pos_in_line = 0;
+                pos_in_line = 1;
             }
         }
 
         let lines: Vec<&str> = source.lines().collect();
         let line_content_untrimmed = lines[line];
-        let line_content = line_content_untrimmed.trim().to_string();
-        
-        pos_in_line -= line_content_untrimmed.len()-line_content.len();
+        let line_content = line_content_untrimmed.trim_start().to_string();
 
         // get the line content there
         Self{
@@ -82,11 +82,12 @@ impl Display for ShorkError{
 impl Display for ErrorType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let to_print = match *self {
-            Self::InterpreterError => "Interpreter Error",
-            Self::LexicalError => "Lexical Error",
-            Self::ReadingError => "Reading Error",
-            Self::SyntaxError => "Syntax Error",
-            Self::TypeError => "Type Error"
+            Self::Warning => "Warning".color(Color::Yellow),
+            Self::InterpreterError => "Interpreter Error".color(Color::Red),
+            Self::LexicalError => "Lexical Error".color(Color::Red),
+            Self::ReadingError => "Reading Error".color(Color::Red),
+            Self::SyntaxError => "Syntax Error".color(Color::Red),
+            Self::TypeError => "Type Error".color(Color::Red)
         };
         write!(f, "{}", to_print)
     }
