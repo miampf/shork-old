@@ -8,9 +8,9 @@ get std::io
 define example(){
     me = 44.5
     if me == 22{
-        io.print("me")
+        io::print("me")
     }
-    io.print("Oh hi there")
+    io::print("Oh hi there")
 }
         "#.to_string();
     
