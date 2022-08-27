@@ -29,3 +29,7 @@ version = "0.1.0"
 dependencies = [
  "shork-error",
 ]
+
+[[package]]
+name = "shork-parser"
+version = "0.1.0"

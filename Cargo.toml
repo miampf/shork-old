@@ -2,5 +2,6 @@
 members = [
     "error",
     "lexer",
+    "parser",
     "shork-cli"
 ]
