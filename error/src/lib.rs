@@ -16,12 +16,13 @@ pub struct ShorkError{
 /// Different error types that can be thrown with a ShorkError
 #[derive(Copy, Clone, Debug)]
 pub enum ErrorType{
-    Warning,
     InterpreterError,
     LexicalError,
+    ParserError,
     ReadingError,
     SyntaxError,
     TypeError,
+    Warning,
 }
 
 impl ShorkError{
@@ -85,6 +86,7 @@ impl Display for ErrorType{
             Self::Warning => "Warning".color(Color::Yellow),
             Self::InterpreterError => "Interpreter Error".color(Color::Red),
             Self::LexicalError => "Lexical Error".color(Color::Red),
+            Self::ParserError => "Parser Error".color(Color::Red),
             Self::ReadingError => "Reading Error".color(Color::Red),
             Self::SyntaxError => "Syntax Error".color(Color::Red),
             Self::TypeError => "Type Error".color(Color::Red)
