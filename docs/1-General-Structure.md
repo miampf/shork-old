@@ -10,7 +10,7 @@ reef examples
 get std::io
 
 define example(){
-    io.print("Hello Sea 🦈")
+    io::print("Hello Sea 🦈")
 }
 ```
 
