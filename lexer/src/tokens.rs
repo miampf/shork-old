@@ -1,5 +1,5 @@
 /// All different token types that can be found
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub enum TokenType{
     // single character stuff
     LeftParen, RightParen, LeftCurlyParen, RightCurlyParen,
@@ -9,7 +9,7 @@ pub enum TokenType{
     // one or more characters
     Exclamation, ExclamationEqual, Equal, EqualEqual, Greater,
     GreaterEqual, GreaterGreater, Lesser, LesserEqual, LesserLesser,
-    Slash, Colon, ColonColon,
+    Slash, Colon, ColonColon, Modulo,
 
     // Type literals and type keywords
     Identifier, Integer, IntegerType, Float, FloatType, Char, CharType,
@@ -23,7 +23,7 @@ pub enum TokenType{
 }
 
 /// A token in a shork program
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct Token{
     t_type: TokenType,
     position: usize,
