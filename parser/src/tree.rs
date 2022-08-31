@@ -27,6 +27,11 @@ impl<'a> AST<'a>{
         self.arena.push(n);
     }
 
+    /// add a mutable node. Could be helpful to avoid rust shenanigans
+    pub fn add_mut(&mut self, n: &'a mut Node){
+        self.arena.push(n)
+    }
+
     /// get a node from an id
     pub fn get(&mut self, id: usize) -> Result<&Node, ShorkError>{
         self.arena.sort();
@@ -51,12 +56,60 @@ impl<'a> AST<'a>{
         let siblings = p_n.children();
         Ok(siblings.clone())
     }
+
+    /// get the root node(s)
+    pub fn root(&self) -> Vec<usize>{
+        let mut n_vec = Vec::new();
+        for n in &self.arena{
+            if n.parent().is_none(){
+                n_vec.push(n.id())
+            }
+        }
+
+        n_vec
+    }
+
+    /// print the tree
+    pub fn print(&mut self) {
+        use ptree::{print_tree_with, Color, PrintConfig, Style, print_config::ASCII_CHARS_TICK};
+
+        let config = {
+            let mut config = PrintConfig::from_env();
+            config.branch = Style {
+                foreground: Some(Color::Red),
+                dimmed: true,
+                ..Style::default()
+            };
+            config.leaf = Style {
+                bold: true,
+                ..Style::default()
+            };
+            config.characters = ASCII_CHARS_TICK.into();
+            config.indent = 4;
+            config
+        };
+
+        let mut parena = Vec::new();
+
+        for n in self.arena.clone(){
+            parena.push(n.clone())
+        }
+
+        for n_id in self.root(){
+            let n = self.get(n_id).expect("Failed to get node from id");
+            let n_print = NodePrinter{
+                node: n.clone(),
+                arena: parena.clone()
+            };
+            print_tree_with(&n_print, &config).expect("Failed to print tree");
+        }
+    }
 }
 
 impl Node{
     /// create a new node
     pub fn new(id: usize, val: Token, parent: Option<usize>, children: Vec<usize>) -> Self{
-        Self { id, val, parent, children }
+        Self { id, val, parent, children}
     }
 
     /// set the parent
@@ -93,5 +146,37 @@ impl Node{
 impl Ord for Node{
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.id.cmp(&other.id)
+    }
+}
+
+#[derive(Debug, Clone)]
+struct NodePrinter{
+    node: Node,
+    arena: Vec<Node>
+}
+
+impl ptree::TreeItem for NodePrinter{
+    type Child = Self;
+
+    fn write_self<W: std::io::Write>(&self, f: &mut W, style: &ptree::Style) -> std::io::Result<()> {
+        write!(f, "{} {}", style.paint(format!("{:?}", self.node.val().token_type())), style.paint(format!("{:?}", self.node.val().raw())))
+    }
+
+    fn children(&self) -> std::borrow::Cow<[Self::Child]> {
+        let mut c_vec = Vec::new();
+
+        for c in self.node.children(){
+            for n in &self.arena{
+                if n.id() == *c{
+                    let n_print = Self {
+                        node: n.clone(),
+                        arena: self.arena.clone()
+                    };
+                    c_vec.push(n_print)
+                }
+            }
+        }
+
+        c_vec.into()
     }
 }
