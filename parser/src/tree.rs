@@ -75,17 +75,23 @@ impl<'a> AST<'a>{
 
         let config = {
             let mut config = PrintConfig::default();
-            config.branch = Style {
-                foreground: Some(Color::Blue),
-                dimmed: true,
-                ..Style::default()
-            };
-            config.leaf = Style {
-                foreground: Some(Color::Green),
-                bold: true,
-                ..Style::default()
-            };
-            config.characters = print_config::UTF_CHARS.into();
+            if std::env::var("NO_COLOR").is_ok(){
+                config.branch = Style::default();
+                config.leaf = Style::default();
+                config.characters = print_config::ASCII_CHARS_TICK.into();
+            } else {
+                config.branch = Style {
+                    foreground: Some(Color::Blue),
+                    dimmed: true,
+                    ..Style::default()
+                };
+                config.leaf = Style {
+                    foreground: Some(Color::Green),
+                    bold: true,
+                    ..Style::default()
+                };
+                config.characters = print_config::UTF_CHARS.into();
+            }
             config.indent = 4;
             config
         };

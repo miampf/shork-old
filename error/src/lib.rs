@@ -83,13 +83,13 @@ impl Display for ShorkError{
 impl Display for ErrorType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let to_print = match *self {
-            Self::Warning => "Warning".color(Color::Yellow),
-            Self::InterpreterError => "Interpreter Error".color(Color::Red),
-            Self::LexicalError => "Lexical Error".color(Color::Red),
-            Self::ParserError => "Parser Error".color(Color::Red),
-            Self::ReadingError => "Reading Error".color(Color::Red),
-            Self::SyntaxError => "Syntax Error".color(Color::Red),
-            Self::TypeError => "Type Error".color(Color::Red)
+            Self::Warning => {let mut string = "Warning".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Yellow).to_string();}string},
+            Self::InterpreterError => {let mut string = "Interpreter Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string},
+            Self::LexicalError => {let mut string = "Lexical Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string},
+            Self::ParserError => {let mut string = "Parser Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string},
+            Self::ReadingError => {let mut string = "Reading Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string},
+            Self::SyntaxError => {let mut string = "Syntax Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string},
+            Self::TypeError => {let mut string = "Type Error".to_string(); if std::env::var("NO_COLOR").is_err(){string = string.color(Color::Red).to_string();}string}
         };
         write!(f, "{}", to_print)
     }
