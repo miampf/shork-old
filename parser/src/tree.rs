@@ -71,20 +71,21 @@ impl<'a> AST<'a>{
 
     /// print the tree
     pub fn print(&mut self) {
-        use ptree::{print_tree_with, Color, PrintConfig, Style, print_config::ASCII_CHARS_TICK};
+        use ptree::{print_tree_with, Color, PrintConfig, Style, print_config};
 
         let config = {
-            let mut config = PrintConfig::from_env();
+            let mut config = PrintConfig::default();
             config.branch = Style {
-                foreground: Some(Color::Red),
+                foreground: Some(Color::Blue),
                 dimmed: true,
                 ..Style::default()
             };
             config.leaf = Style {
+                foreground: Some(Color::Green),
                 bold: true,
                 ..Style::default()
             };
-            config.characters = ASCII_CHARS_TICK.into();
+            config.characters = print_config::UTF_CHARS.into();
             config.indent = 4;
             config
         };
