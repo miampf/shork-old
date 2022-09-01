@@ -25,16 +25,13 @@ define example(){
     let mut ast = AST::new();
 
     let nodes = [
-            Node::new(0, Token::new(TokenType::And, 0, 0, vec![0]), None, vec![1, 2, 3]),
-            Node::new(1, Token::new(TokenType::AndSym, 0, 0, vec![0]), Some(0), vec![4, 5]),
-            Node::new(2, Token::new(TokenType::As, 0, 0, vec![0]), Some(0), vec![]),
-            Node::new(3, Token::new(TokenType::Asterisk, 0, 0, vec![0]), Some(0), vec![]),
-            Node::new(4, Token::new(TokenType::Boolean, 0, 0, vec![0]), Some(2), vec![]),
-            Node::new(5, Token::new(TokenType::BooleanType, 0, 0, vec![0]), Some(2), vec![]),
-            ];
+            Node::new(0, Token::new(TokenType::Plus, 1, 1, "+".to_string().into_bytes()), None, vec![1, 2]),
+            Node::new(1, Token::new(TokenType::IntegerType, 0, 2, vec![23]), Some(0), vec![]),
+            Node::new(2, Token::new(TokenType::IntegerType, 2, 1, vec![2]), Some(0), vec![])
+        ];
             
-    for i in 0..nodes.len(){
-        ast.add(&nodes[i])
+    for n in &nodes{
+        ast.add(n)
     }
 
     ast.print()
