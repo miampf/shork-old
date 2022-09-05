@@ -9,7 +9,7 @@ pub enum TokenType{
     // one or more characters
     Exclamation, ExclamationEqual, Equal, EqualEqual, Greater,
     GreaterEqual, GreaterGreater, Lesser, LesserEqual, LesserLesser,
-    Slash, Colon, ColonColon, Modulo,
+    Slash, Colon, ColonColon, Percent,
 
     // Type literals and type keywords
     Identifier, Integer, IntegerType, Float, FloatType, Char, CharType,

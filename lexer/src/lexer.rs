@@ -70,7 +70,7 @@ impl<'a> Lexer<'a>{
             '|' => Ok(Some(Pipe)),
             '&' => Ok(Some(AndSym)),
             '^' => Ok(Some(Roof)),
-            '%' => Ok(Some(Modulo)),
+            '%' => Ok(Some(Percent)),
             '!' => if self.does_match('=')? {self.current += 1; Ok(Some(ExclamationEqual))} else {Ok(Some(Exclamation))},
             '=' => if self.does_match('=')? {self.current += 1; Ok(Some(EqualEqual))} else {Ok(Some(Equal))},
             ':' => if self.does_match(':')? {self.current += 1; Ok(Some(ColonColon))} else {Ok(Some(Colon))},
