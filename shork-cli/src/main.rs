@@ -1,6 +1,6 @@
-use shork_lexer::{lexer::Lexer, tokens::Token, tokens::TokenType};
-use shork_error::report::StderrReporter;
-use shork_parser::tree::{AST, Node};
+use shork_lexer::{lexer::Lexer};
+use shork_error::report::{StderrReporter, Reporter};
+use shork_parser:: expressions::ExprParser;
 
 fn main() {
     let program = r#"
@@ -22,18 +22,20 @@ define example(){
         println!("{:?}", token)
     }
 
-    let mut ast = AST::new();
+    // this expression doesn't make any sense and is just for testing
+    let expr = "(2 + 2 == 2 * 2 | 1) + false << true".to_string();
 
-    let nodes = [
-            Node::new(0, Token::new(TokenType::Plus, 1, 1, "+".to_string().into_bytes()), None, vec![1, 2]),
-            Node::new(1, Token::new(TokenType::IntegerType, 0, 2, vec![23]), Some(0), vec![]),
-            Node::new(2, Token::new(TokenType::IntegerType, 2, 1, vec![2]), Some(0), vec![])
-        ];
-            
-    for n in nodes{
-        ast.add(n)
+    let mut reporter = StderrReporter::new();
+    let mut l = Lexer::new(expr.clone(), &mut reporter);
+    l.scan_tokens().unwrap();
+
+    let mut p = ExprParser::new(l.get_tokens().clone(), 0, &mut reporter, expr);
+    p.parse();
+
+    let mut t = p.tree().clone();
+    t.print();
+
+    for e in reporter.get_errors(){
+        reporter.display_error(e.clone())
     }
-
-    ast.print()
-
 }
