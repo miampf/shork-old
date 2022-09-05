@@ -240,6 +240,9 @@ impl<'a> Lexer<'a>{
             } else if t_type == RegexType{
                 // here, too, we can safely unwrap (hopefully)
                 raw_string = raw_string.strip_prefix("#").unwrap().strip_suffix("#").unwrap().to_string();
+            } else if t_type == CharType{
+                // here, too, we can safely unwrap (hopefully)
+                raw_string = raw_string.strip_prefix("'").unwrap().strip_suffix("'").unwrap().to_string();
             }
 
             let raw;

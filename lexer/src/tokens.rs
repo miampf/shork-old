@@ -56,4 +56,37 @@ impl Token{
     pub fn raw(&self) -> &Vec<u8>{
         &self.raw
     }
+
+    /// get the contents as an int
+    pub fn content_int(&self) -> isize{
+        let mut slice = [0u8; 8];
+        for i in 0..8{
+            slice[i] = self.raw[i]
+        }
+        isize::from_ne_bytes(slice)
+    }
+
+    /// get the contents as a float
+    pub fn content_float(&self) -> f64{
+        let mut slice = [0u8; 8];
+        for i in 0..8{
+            slice[i] = self.raw[i]
+        }
+        f64::from_ne_bytes(slice)
+    }
+
+    /// get the contents as a string
+    pub fn content_string(&self) -> Result<String, std::string::FromUtf8Error>{
+        String::from_utf8(self.raw.clone())
+    }
+
+    /// get the contents as a char
+    pub fn content_char(&self) -> char{
+        self.content_string().unwrap().chars().next().unwrap()
+    }
+
+    /// get the contents as a bool
+    pub fn content_bool(&self) -> bool{
+        self.raw[0] == 1
+    }
 }

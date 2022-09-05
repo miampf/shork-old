@@ -188,7 +188,18 @@ impl ptree::TreeItem for NodePrinter{
     type Child = Self;
 
     fn write_self<W: std::io::Write>(&self, f: &mut W, style: &ptree::Style) -> std::io::Result<()> {
-        write!(f, "{} {}", style.paint(format!("{:?}", self.node.val().token_type())), style.paint(format!("{:?}", self.node.val().raw())))
+        use shork_lexer::tokens::TokenType::*;
+
+        let t_type = self.node.val().token_type();
+        let val = match *t_type{
+            IntegerType => format!("{}", self.node.val().content_int()),
+            FloatType => format!("{}", self.node.val().content_float()),
+            CharType => format!("{}", self.node.val().content_char()),
+            BooleanType => format!("{}", self.node.val().content_bool()),
+            _ => self.node.val().content_string().unwrap()
+        };
+
+        write!(f, "{} {}", style.paint(format!("{:?}", t_type)), style.paint(format!("{:?}", val)))
     }
 
     fn children(&self) -> std::borrow::Cow<[Self::Child]> {
