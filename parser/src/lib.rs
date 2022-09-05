@@ -20,8 +20,8 @@ mod tests {
             Node::new(4, Token::new(TokenType::And, 0, 0, vec![0]), Some(2), vec![]),
             ];
             
-        for i in 0..nodes.len(){
-            ast.add(&nodes[i])
+        for n in nodes.clone(){
+            ast.add(n)
         }
 
         let n_by_id = ast.get(4).unwrap();

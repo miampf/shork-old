@@ -3,8 +3,8 @@ use shork_error::{ShorkError, ErrorType};
 
 /// Represents an Abstract Syntax Tree
 #[derive(Debug, Clone, PartialEq)]
-pub struct AST<'a>{
-    arena: Vec<&'a Node>
+pub struct AST{
+    arena: Vec<Node>
 }
 
 /// A node with an ID
@@ -16,20 +16,30 @@ pub struct Node{
     children: Vec<usize>
 }
 
-impl<'a> AST<'a>{
+impl AST{
     /// create a new AST
     pub fn new() -> Self{
         Self { arena: Vec::new() }
     }
 
     /// add a node to the arena
-    pub fn add(&mut self, n: &'a Node) {
+    pub fn add(&mut self, n: Node) {
         self.arena.push(n);
     }
 
-    /// add a mutable node. Could be helpful to avoid rust shenanigans
-    pub fn add_mut(&mut self, n: &'a mut Node){
-        self.arena.push(n)
+    /// add all nodes of this tree to another tree
+    pub fn clone_into_tree(&self, other: &mut Self) {
+        for n in self.arena.clone(){
+            other.add(n)
+        }
+    }
+
+    /// give all current root nodes the given id as a root
+    pub fn set_root_all(&mut self, root_id: usize) {
+        for cr in self.root(){
+            let n = self.get_mut(cr).unwrap(); // unwrap should be safe
+            n.set_parent(Some(root_id))
+        }
     }
 
     /// get a node from an id
@@ -43,6 +53,18 @@ impl<'a> AST<'a>{
         }
 
         Ok(&self.arena[index.unwrap()])
+    }
+
+    /// get a mutable node from an id
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Node, ShorkError>{
+        self.arena.sort();
+        let index = self.arena.binary_search_by_key(&id, |n| n.id);
+        if index.is_err(){
+            return Err(
+                ShorkError::generate_error(ErrorType::ParserError, 0, "".to_string(), "Failed to find Node in AST. This is an error by the interpreter and not in your source code".to_string())
+            );
+        }
+        Ok(&mut self.arena[index.unwrap()])
     }
 
     /// get the siblings of a node. Includes the node itself

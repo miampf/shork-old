@@ -30,7 +30,7 @@ define example(){
             Node::new(2, Token::new(TokenType::IntegerType, 2, 1, vec![2]), Some(0), vec![])
         ];
             
-    for n in &nodes{
+    for n in nodes{
         ast.add(n)
     }
 
