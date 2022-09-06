@@ -59,6 +59,9 @@ impl<'a> ExprParser<'a>{
         
         // is there a |, &, << or >>?
         while self.match_token(vec![Pipe, And, LesserLesser, GreaterGreater]){
+            // check for unexpected tokens
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+
             self.id_offset += 1;
 
             let operator = self.previous();
@@ -83,6 +86,9 @@ impl<'a> ExprParser<'a>{
         
         // is there a >, >=, < or <=?
         while self.match_token(vec![Greater, GreaterEqual, Lesser, LesserEqual]){
+            // check for unexpected tokens
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+
             self.id_offset += 1;
 
             let operator = self.previous();
@@ -107,6 +113,9 @@ impl<'a> ExprParser<'a>{
         
         // is there a - or +?
         while self.match_token(vec![Minus, Plus]){
+            // check for unexpected tokens
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+
             self.id_offset += 1;
 
             let operator = self.previous();
@@ -131,6 +140,9 @@ impl<'a> ExprParser<'a>{
         
         // is there a /, * or %?
         while self.match_token(vec![Slash, Asterisk, Percent]){
+            // check for unexpected tokens
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+
             self.id_offset += 1;
 
             let operator = self.previous();
@@ -152,13 +164,25 @@ impl<'a> ExprParser<'a>{
     fn unary(&mut self) -> AST{
         // is there a ! or -?
         if self.match_token(vec![Exclamation, Minus]){
+            // handle unexpected tokens
+            if self.previous().token_type() == &Exclamation{
+                self.check_error(vec![BooleanType, Exclamation, LeftParen], format!("Expected a boolean, '!' or '(', found {:?}", self.peek().token_type()));
+            }
+            if self.previous().token_type() == &Minus{
+                self.check_error(vec![IntegerType, FloatType, Minus], format!("Expected a number, found {:?}", self.peek().token_type()));
+            }
+            
             self.id_offset += 1;
             let operator = self.previous();
             let mut tree = self.unary();
-
+            
             // make the operator the root node for everyone
+            self.id_offset += 1;
             let n = Node::new(self.id_offset, operator, None, tree.root());
             tree.set_root_all(n.id());
+            tree.add(n);
+            
+            println!("{:?}", tree);
 
             return tree;
         }
@@ -221,6 +245,18 @@ impl<'a> ExprParser<'a>{
         self.tokens[self.current].clone()
     }
 
+    /// check if the token is of one of the given types without advancing
+    fn match_token_no_advance(&self, t_types: Vec<TokenType>) -> bool{
+        if self.at_end(){return false}
+        for t_type in t_types{
+            if self.tokens[self.current].token_type() == &t_type{
+                return true;
+            }
+        }
+
+        false
+    }
+
     /// advance one position
     fn advance(&mut self) -> Token{
         if !self.at_end() {self.current += 1}
@@ -230,6 +266,14 @@ impl<'a> ExprParser<'a>{
     /// return the previous token
     fn previous(&self) -> Token{
         self.tokens[self.current-1].clone()
+    }
+
+    /// check for an unexpected token.
+    fn check_error(&mut self, expected_tokens: Vec<TokenType>, error_message: std::string::String) {
+        if !self.match_token_no_advance(expected_tokens){
+            let e = ShorkError::generate_error(ErrorType::ParserError, self.peek().position(), self.source.clone(), error_message);
+            self.error_reporter.add_error(e);
+        }
     }
 
     /// get the tree
