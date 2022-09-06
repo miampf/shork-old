@@ -117,6 +117,7 @@ impl<'a> Lexer<'a>{
                     self.error_reporter.add_error(e.clone());
                     return Err(e)
                 }
+                self.advance()?; // consume the closing '
                 Ok(Some(CharType))
             },
             '#' => {
@@ -242,6 +243,7 @@ impl<'a> Lexer<'a>{
                 raw_string = raw_string.strip_prefix("#").unwrap().strip_suffix("#").unwrap().to_string();
             } else if t_type == CharType{
                 // here, too, we can safely unwrap (hopefully)
+                println!("{}", raw_string);
                 raw_string = raw_string.strip_prefix("'").unwrap().strip_suffix("'").unwrap().to_string();
             }
 
