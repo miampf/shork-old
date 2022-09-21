@@ -1,7 +1,7 @@
 use shork_parser::tree::AST;
 use shork_lexer::tokens::{Token, TokenType, TokenType::*};
 use shork_error::{ShorkError, ErrorType};
-use std::ops::{BitAnd, BitOr, Shl, Shr, Add, Sub, Div, Mul, Rem, Not, Neg};
+use std::{ops::{BitAnd, BitOr, Shl, Shr, Add, Sub, Div, Mul, Rem, Not, Neg}, fmt::Display};
 
 /// This contains an evaluated result
 #[derive(Debug, Clone, PartialEq)]
@@ -378,6 +378,17 @@ impl ShorkExprEvalResult{
     /// check if its an error
     pub fn is_err(&self) -> bool{
         self.r_type == 5
+    }
+}
+
+impl Display for ShorkExprEvalResult{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.r_type{
+            0 => write!(f, "{}", self.get_boolean().unwrap()),
+            1 => write!(f, "{}", self.get_isize().unwrap()),
+            2 => write!(f, "{}", self.get_float().unwrap()),
+            _ => write!(f, "{}", self.get_string().clone().unwrap())
+        }
     }
 }
 
