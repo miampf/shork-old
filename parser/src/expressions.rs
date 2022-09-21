@@ -114,7 +114,7 @@ impl<'a> ExprParser<'a>{
         // is there a - or +?
         while self.match_token(vec![Minus, Plus]){
             // check for unexpected tokens
-            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType, StringType], format!("Expected number, found {:?}", self.peek().token_type()));
 
             self.id_offset += 1;
 
