@@ -397,6 +397,11 @@ dependencies = [
 [[package]]
 name = "shork-interpreter"
 version = "0.1.0"
+dependencies = [
+ "shork-error",
+ "shork-lexer",
+ "shork-parser",
+]
 
 [[package]]
 name = "shork-lexer"
