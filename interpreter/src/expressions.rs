@@ -556,8 +556,6 @@ impl ExprEvaluator{
         let mut res;
 
         if self.match_t(r.val(), vec![Slash, Asterisk, Percent]){
-            println!("0 {:?}", r);
-
             // we have a bitwise statement
             let childs = r.children();
             let left = self.equality(tree, childs[0])?;
@@ -596,7 +594,6 @@ impl ExprEvaluator{
         let mut res;
 
         if self.match_t(r.val(), vec![Exclamation, Minus]){
-            println!("1 {:?}", r);
             let right = self.equality(tree, n)?;
             res = match r.val().token_type(){
                 Exclamation => Ok(!right),
@@ -627,7 +624,6 @@ impl ExprEvaluator{
     /// evaluate unary expressions
     fn primary(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
         let r = tree.get(n)?.clone();
-        println!("2 {:?}", r);
         let mut res = match r.val().token_type(){
             // the true values
             BooleanType => Ok(ShorkExprEvalResult::boolean(r.val().content_bool())),
