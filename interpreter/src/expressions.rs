@@ -25,10 +25,30 @@ pub struct ExprEvaluator{
 impl PartialOrd for ShorkExprEvalResult{
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match self.r_type{
-            0 => Some(self.v_b.cmp(&other.get_boolean())),
-            1 => Some(self.v_i.cmp(&other.get_isize())),
-            2 => Some(self.v_f.partial_cmp(&other.get_float()).unwrap()),
-            _ => Some(self.v_s.cmp(other.get_string()))
+            0 => {
+                if self.v_b.is_some() && other.get_boolean().is_some(){
+                    return Some(self.v_b.unwrap().cmp(&other.get_boolean().unwrap()))
+                }
+                None
+            },
+            1 => {
+                if self.v_i.is_some() && other.get_isize().is_some(){
+                    return Some(self.v_i.unwrap().cmp(&other.get_isize().unwrap()))
+                }
+                None
+            },
+            2 => {
+                if self.v_f.is_some() && other.get_float().is_some(){
+                    return Some(self.v_f.unwrap().partial_cmp(&other.get_float().unwrap()).unwrap())
+                }
+                None
+            },
+            _ => {
+                if self.v_s.is_some() && other.get_string().is_some(){
+                    return Some(self.v_s.clone().unwrap().cmp(&other.get_string().clone().unwrap()))
+                }
+                None
+            },
         }
     }
 }
@@ -38,8 +58,18 @@ impl Neg for ShorkExprEvalResult{
 
     fn neg(self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(-self.v_i.unwrap()),
-            2 => Self::float(-self.v_f.unwrap()),
+            1 => {
+                if self.v_i.is_some(){
+                    return Self::integer(-self.v_i.unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some(){
+                    return Self::float(-self.v_f.unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Unary '-' on {}", self.get_type_string()))
         }
     }
@@ -50,7 +80,12 @@ impl Not for ShorkExprEvalResult{
 
     fn not(self) -> Self::Output {
         match self.r_type{
-            0 => Self::boolean(!self.v_b.unwrap()),
+            0 => {
+                if self.v_b.is_some(){
+                    return Self::boolean(!self.v_b.unwrap())
+                }
+                Self::error("None value in boolean type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Unary '!' on {}", self.get_type_string()))
         }
     }
@@ -61,8 +96,18 @@ impl Rem for ShorkExprEvalResult{
 
     fn rem(self, rhs: Self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(self.v_i.unwrap() % rhs.get_isize().unwrap()),
-            2 => Self::float(self.v_f.unwrap() % rhs.get_float().unwrap()),
+            1 => {
+                if self.v_i.is_some() && rhs.get_isize().is_some(){
+                    return Self::integer(self.v_i.unwrap() % rhs.get_isize().unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some() && rhs.get_float().is_some(){
+                    return Self::float(self.v_f.unwrap() % rhs.get_float().unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Operation '%' on {} and {}", self.get_type_string(), rhs.get_type_string()))
         }
     }
@@ -73,8 +118,18 @@ impl Mul for ShorkExprEvalResult{
 
     fn mul(self, rhs: Self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(self.v_i.unwrap() * rhs.get_isize().unwrap()),
-            2 => Self::float(self.v_f.unwrap() * rhs.get_float().unwrap()),
+            1 => {
+                if self.v_i.is_some() && rhs.get_isize().is_some(){
+                    return Self::integer(self.v_i.unwrap() * rhs.get_isize().unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some() && rhs.get_float().is_some(){
+                    return Self::float(self.v_f.unwrap() * rhs.get_float().unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Operation '*' on {} and {}", self.get_type_string(), rhs.get_type_string()))
         }
     }
@@ -85,8 +140,18 @@ impl Div for ShorkExprEvalResult{
 
     fn div(self, rhs: Self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(self.v_i.unwrap() / rhs.get_isize().unwrap()),
-            2 => Self::float(self.v_f.unwrap() / rhs.get_float().unwrap()),
+            1 => {
+                if self.v_i.is_some() && rhs.get_isize().is_some(){
+                    return Self::integer(self.v_i.unwrap() / rhs.get_isize().unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some() && rhs.get_float().is_some(){
+                    return Self::float(self.v_f.unwrap() / rhs.get_float().unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Operation '/' on {} and {}", self.get_type_string(), rhs.get_type_string()))
         }
     }
@@ -97,8 +162,18 @@ impl Sub for ShorkExprEvalResult{
 
     fn sub(self, rhs: Self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(self.v_i.unwrap() - rhs.get_isize().unwrap()),
-            2 => Self::float(self.v_f.unwrap() - rhs.get_float().unwrap()),
+            1 => {
+                if self.v_i.is_some() && rhs.get_isize().is_some(){
+                    return Self::integer(self.v_i.unwrap() - rhs.get_isize().unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some() && rhs.get_float().is_some(){
+                    return Self::float(self.v_f.unwrap() - rhs.get_float().unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Operation '+' on {} and {}", self.get_type_string(), rhs.get_type_string()))
         }
     }
@@ -109,9 +184,24 @@ impl Add for ShorkExprEvalResult{
 
     fn add(self, rhs: Self) -> Self::Output {
         match self.r_type{
-            1 => Self::integer(self.v_i.unwrap() + rhs.get_isize().unwrap()),
-            2 => Self::float(self.v_f.unwrap() + rhs.get_float().unwrap()),
-            3 => Self::string(self.v_s.unwrap() + rhs.get_string().clone().unwrap().as_str()),
+            1 => {
+                if self.v_i.is_some() && rhs.get_isize().is_some(){
+                    return Self::integer(self.v_i.unwrap() + rhs.get_isize().unwrap())
+                }
+                Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
+            },
+            2 => {
+                if self.v_f.is_some() && rhs.get_float().is_some(){
+                    return Self::float(self.v_f.unwrap() + rhs.get_float().unwrap())
+                }
+                Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
+            },
+            3 => {
+                if self.v_s.is_some() && rhs.get_string().is_some(){
+                    return Self::string(self.v_s.unwrap() + rhs.get_string().clone().unwrap().as_str())
+                }
+                Self::error("None value in string type. This is an error in the interpreter and not in your code".to_string())
+            },
             _ => Self::error(format!("Unsupported Operation '+' on {} and {}", self.get_type_string(), rhs.get_type_string()))
         }
     }
@@ -309,8 +399,8 @@ impl ExprEvaluator{
         if self.match_t(r.val(), vec![EqualEqual, ExclamationEqual]){
             // we have an equality statement
             let childs = r.children();
-            let left = self.bitwise(tree, childs[0])?;
-            let right = self.bitwise(tree, childs[1])?;
+            let left = self.equality(tree, childs[0])?;
+            let right = self.equality(tree, childs[1])?;
 
             res = match r.val().token_type(){
                 ExclamationEqual => Ok(ShorkExprEvalResult::boolean(left != right)),
@@ -324,6 +414,11 @@ impl ExprEvaluator{
         } else{
             res = self.bitwise(tree, n);
         }
+
+        if res.is_err(){
+            return res
+        }
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
@@ -341,8 +436,8 @@ impl ExprEvaluator{
         if self.match_t(r.val(), vec![Pipe, And, LesserLesser, GreaterGreater]){
             // we have a bitwise statement
             let childs = r.children();
-            let left = self.comparison(tree, childs[0])?;
-            let right = self.comparison(tree, childs[1])?;
+            let left = self.equality(tree, childs[0])?;
+            let right = self.equality(tree, childs[1])?;
 
             res = match r.val().token_type(){
                 Pipe => Ok(left | right),
@@ -358,6 +453,11 @@ impl ExprEvaluator{
         } else{
             res = self.comparison(tree, n);
         }
+
+        if res.is_err(){
+            return res
+        }
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
@@ -375,8 +475,8 @@ impl ExprEvaluator{
         if self.match_t(r.val(), vec![Greater, GreaterEqual, Lesser, LesserEqual]){
             // we have a bitwise statement
             let childs = r.children();
-            let left = self.term(tree, childs[0])?;
-            let right = self.term(tree, childs[1])?;
+            let left = self.equality(tree, childs[0])?;
+            let right = self.equality(tree, childs[1])?;
 
             res = match r.val().token_type(){
                 Greater => Ok(ShorkExprEvalResult::boolean(left > right)),
@@ -392,6 +492,11 @@ impl ExprEvaluator{
         } else{
             res = self.term(tree, n);
         }
+
+        if res.is_err(){
+            return res
+        }
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
@@ -406,11 +511,18 @@ impl ExprEvaluator{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        if self.match_t(r.val(), vec![Minus, Plus]){
+        let siblings;
+        if r.parent().is_some(){
+            siblings = tree.siblings(&r)?.len();
+        } else {
+            siblings = 0;
+        }
+
+        if self.match_t(r.val(), vec![Minus, Plus]) && (siblings == 2 || r.val().token_type() == &Plus){
             // we have a bitwise statement
             let childs = r.children();
-            let left = self.factor(tree, childs[0])?;
-            let right = self.factor(tree, childs[1])?;
+            let left = self.equality(tree, childs[0])?;
+            let right = self.equality(tree, childs[1])?;
 
             res = match r.val().token_type(){
                 Minus => Ok(left - right),
@@ -424,6 +536,11 @@ impl ExprEvaluator{
         } else{
             res = self.factor(tree, n);
         }
+
+        if res.is_err(){
+            return res
+        }
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
@@ -439,10 +556,12 @@ impl ExprEvaluator{
         let mut res;
 
         if self.match_t(r.val(), vec![Slash, Asterisk, Percent]){
+            println!("0 {:?}", r);
+
             // we have a bitwise statement
             let childs = r.children();
-            let left = self.unary(tree, childs[0])?;
-            let right = self.unary(tree, childs[1])?;
+            let left = self.equality(tree, childs[0])?;
+            let right = self.equality(tree, childs[1])?;
 
             res = match r.val().token_type(){
                 Slash => Ok(left / right),
@@ -457,6 +576,11 @@ impl ExprEvaluator{
         } else{
             res = self.unary(tree, n);
         }
+
+        if res.is_err(){
+            return res
+        }
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
@@ -472,7 +596,8 @@ impl ExprEvaluator{
         let mut res;
 
         if self.match_t(r.val(), vec![Exclamation, Minus]){
-            let right = self.unary(tree, n)?;
+            println!("1 {:?}", r);
+            let right = self.equality(tree, n)?;
             res = match r.val().token_type(){
                 Exclamation => Ok(!right),
                 Minus => Ok(-right),
@@ -484,6 +609,10 @@ impl ExprEvaluator{
             }
         } else {
             res = self.primary(tree, n)
+        }
+
+        if res.is_err(){
+            return res
         }
 
         if res.clone().unwrap().is_err(){
@@ -498,6 +627,7 @@ impl ExprEvaluator{
     /// evaluate unary expressions
     fn primary(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
         let r = tree.get(n)?.clone();
+        println!("2 {:?}", r);
         let mut res = match r.val().token_type(){
             // the true values
             BooleanType => Ok(ShorkExprEvalResult::boolean(r.val().content_bool())),
@@ -510,6 +640,10 @@ impl ExprEvaluator{
                 Err(e)
             }
         };
+
+        if res.is_err(){
+            return res
+        }
 
         if res.clone().unwrap().is_err(){
             // it's an error

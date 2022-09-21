@@ -40,7 +40,12 @@ impl ShorkError{
         }
 
         let lines: Vec<&str> = source.lines().collect();
-        let line_content_untrimmed = lines[line];
+        let line_content_untrimmed;
+        if lines.len() > 0{
+            line_content_untrimmed = lines[line];
+        } else {
+            line_content_untrimmed = "";
+        }
         let line_content = line_content_untrimmed.trim_start().to_string();
 
         // get the line content there
