@@ -383,6 +383,7 @@ name = "shork"
 version = "0.1.0"
 dependencies = [
  "shork-error",
+ "shork-interpreter",
  "shork-lexer",
  "shork-parser",
 ]

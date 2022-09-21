@@ -1,7 +1,7 @@
 use shork_parser::tree::AST;
 use shork_lexer::tokens::{Token, TokenType, TokenType::*};
 use shork_error::{ShorkError, ErrorType};
-use std::ops::{BitAnd, BitOr, Shl, Shr};
+use std::ops::{BitAnd, BitOr, Shl, Shr, Add, Sub, Div, Mul, Rem, Not, Neg};
 
 /// This contains an evaluated result
 #[derive(Debug, Clone, PartialEq)]
@@ -24,14 +24,96 @@ pub struct ExprEvaluator{
 
 impl PartialOrd for ShorkExprEvalResult{
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let res = match self.r_type{
+        match self.r_type{
             0 => Some(self.v_b.cmp(&other.get_boolean())),
             1 => Some(self.v_i.cmp(&other.get_isize())),
             2 => Some(self.v_f.partial_cmp(&other.get_float()).unwrap()),
             _ => Some(self.v_s.cmp(other.get_string()))
-        };
+        }
+    }
+}
 
-        res
+impl Neg for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(-self.v_i.unwrap()),
+            2 => Self::float(-self.v_f.unwrap()),
+            _ => Self::error(format!("Unsupported Unary '-' on {}", self.get_type_string()))
+        }
+    }
+}
+
+impl Not for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self.r_type{
+            0 => Self::boolean(!self.v_b.unwrap()),
+            _ => Self::error(format!("Unsupported Unary '!' on {}", self.get_type_string()))
+        }
+    }
+}
+
+impl Rem for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(self.v_i.unwrap() % rhs.get_isize().unwrap()),
+            2 => Self::float(self.v_f.unwrap() % rhs.get_float().unwrap()),
+            _ => Self::error(format!("Unsupported Operation '%' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+        }
+    }
+}
+
+impl Mul for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(self.v_i.unwrap() * rhs.get_isize().unwrap()),
+            2 => Self::float(self.v_f.unwrap() * rhs.get_float().unwrap()),
+            _ => Self::error(format!("Unsupported Operation '*' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+        }
+    }
+}
+
+impl Div for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(self.v_i.unwrap() / rhs.get_isize().unwrap()),
+            2 => Self::float(self.v_f.unwrap() / rhs.get_float().unwrap()),
+            _ => Self::error(format!("Unsupported Operation '/' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+        }
+    }
+}
+
+impl Sub for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(self.v_i.unwrap() - rhs.get_isize().unwrap()),
+            2 => Self::float(self.v_f.unwrap() - rhs.get_float().unwrap()),
+            _ => Self::error(format!("Unsupported Operation '+' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+        }
+    }
+}
+
+impl Add for ShorkExprEvalResult{
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        match self.r_type{
+            1 => Self::integer(self.v_i.unwrap() + rhs.get_isize().unwrap()),
+            2 => Self::float(self.v_f.unwrap() + rhs.get_float().unwrap()),
+            3 => Self::string(self.v_s.unwrap() + rhs.get_string().clone().unwrap().as_str()),
+            _ => Self::error(format!("Unsupported Operation '+' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+        }
     }
 }
 
@@ -224,7 +306,7 @@ impl ExprEvaluator{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        if !self.match_t(r.val(), vec![EqualEqual, ExclamationEqual]){
+        if self.match_t(r.val(), vec![EqualEqual, ExclamationEqual]){
             // we have an equality statement
             let childs = r.children();
             let left = self.bitwise(tree, childs[0])?;
@@ -252,11 +334,11 @@ impl ExprEvaluator{
     }
 
     /// evaluate bitwise operations
-    pub fn bitwise(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+    fn bitwise(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        if !self.match_t(r.val(), vec![Pipe, And, LesserLesser, GreaterGreater]){
+        if self.match_t(r.val(), vec![Pipe, And, LesserLesser, GreaterGreater]){
             // we have a bitwise statement
             let childs = r.children();
             let left = self.comparison(tree, childs[0])?;
@@ -286,11 +368,11 @@ impl ExprEvaluator{
     }
 
     /// evaluate comparisons
-    pub fn comparison(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+    fn comparison(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        if !self.match_t(r.val(), vec![Greater, GreaterEqual, Lesser, LesserEqual]){
+        if self.match_t(r.val(), vec![Greater, GreaterEqual, Lesser, LesserEqual]){
             // we have a bitwise statement
             let childs = r.children();
             let left = self.term(tree, childs[0])?;
@@ -303,7 +385,7 @@ impl ExprEvaluator{
                 LesserEqual => Ok(ShorkExprEvalResult::boolean(left <= right)),
                 _ => {
                     // This should NEVER happen
-                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '|', '&', '<<' or '>>' found {:?}", r.val().token_type()));
+                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '>', '>=', '<' or '<=' found {:?}", r.val().token_type()));
                     Err(e)
                 }
             }
@@ -320,30 +402,115 @@ impl ExprEvaluator{
     }
 
     /// evaluate terms
-    pub fn term(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+    fn term(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        if !self.match_t(r.val(), vec![Greater, GreaterEqual, Lesser, LesserEqual]){
+        if self.match_t(r.val(), vec![Minus, Plus]){
             // we have a bitwise statement
             let childs = r.children();
-            let left = self.term(tree, childs[0])?;
-            let right = self.term(tree, childs[1])?;
+            let left = self.factor(tree, childs[0])?;
+            let right = self.factor(tree, childs[1])?;
 
             res = match r.val().token_type(){
-                Greater => Ok(ShorkExprEvalResult::boolean(left > right)),
-                Lesser => Ok(ShorkExprEvalResult::boolean(left < right)),
-                GreaterEqual => Ok(ShorkExprEvalResult::boolean(left >= right)),
-                LesserEqual => Ok(ShorkExprEvalResult::boolean(left <= right)),
+                Minus => Ok(left - right),
+                Plus => Ok(left + right),
                 _ => {
                     // This should NEVER happen
-                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '|', '&', '<<' or '>>' found {:?}", r.val().token_type()));
+                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '-' or '+' found {:?}", r.val().token_type()));
                     Err(e)
                 }
             }
         } else{
-            res = self.term(tree, n);
+            res = self.factor(tree, n);
         }
+        if res.clone().unwrap().is_err(){
+            // it's an error
+            let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
+            res = Err(e)
+        }
+
+        res
+    }
+
+    /// evaluate factors
+    fn factor(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+        let r = tree.get(n)?.clone();
+        let mut res;
+
+        if self.match_t(r.val(), vec![Slash, Asterisk, Percent]){
+            // we have a bitwise statement
+            let childs = r.children();
+            let left = self.unary(tree, childs[0])?;
+            let right = self.unary(tree, childs[1])?;
+
+            res = match r.val().token_type(){
+                Slash => Ok(left / right),
+                Asterisk => Ok(left * right),
+                Percent => Ok(left % right),
+                _ => {
+                    // This should NEVER happen
+                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '/', '*' or '%' found {:?}", r.val().token_type()));
+                    Err(e)
+                }
+            }
+        } else{
+            res = self.unary(tree, n);
+        }
+        if res.clone().unwrap().is_err(){
+            // it's an error
+            let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
+            res = Err(e)
+        }
+
+        res
+    }
+
+    /// evaluate unary expressions
+    fn unary(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+        let r = tree.get(n)?.clone();
+        let mut res;
+
+        if self.match_t(r.val(), vec![Exclamation, Minus]){
+            let right = self.unary(tree, n)?;
+            res = match r.val().token_type(){
+                Exclamation => Ok(!right),
+                Minus => Ok(-right),
+                _ => {
+                    // This should NEVER happen
+                    let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Expected '!' or '-' found {:?}", r.val().token_type()));
+                    Err(e)
+                }
+            }
+        } else {
+            res = self.primary(tree, n)
+        }
+
+        if res.clone().unwrap().is_err(){
+            // it's an error
+            let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
+            res = Err(e)
+        }
+
+        res
+    }
+
+    /// evaluate unary expressions
+    fn primary(&mut self, tree: &mut AST, n: usize) -> Result<ShorkExprEvalResult, ShorkError>{
+        let r = tree.get(n)?.clone();
+        let mut res = match r.val().token_type(){
+            // the true values
+            BooleanType => Ok(ShorkExprEvalResult::boolean(r.val().content_bool())),
+            IntegerType => Ok(ShorkExprEvalResult::integer(r.val().content_int())),
+            FloatType => Ok(ShorkExprEvalResult::float(r.val().content_float())),
+            StringType => Ok(ShorkExprEvalResult::string(r.val().content_string().unwrap())),
+            RegexType => Ok(ShorkExprEvalResult::string(r.val().content_string().unwrap())),
+            _ => {
+                let e = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), format!("Unexpected symbol {:?}! Did you mean something else?", r.val().token_type()));
+                Err(e)
+            }
+        };
+
         if res.clone().unwrap().is_err(){
             // it's an error
             let e  = ShorkError::generate_error(ErrorType::InterpreterError, r.val().position(), self.source.clone(), res.unwrap().e_msg);
