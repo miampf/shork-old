@@ -4,12 +4,7 @@ use shork_parser::expressions::ExprParser;
 use shork_interpreter::expressions::ExprEvaluator;
 
 fn main() {
-    /*
-    * Current error cases:
-    *   !true // has stack overflow?!?!
-    *   -2
-    */
-    let expr = "\"Hello\"+\"World\"".to_string();
+    let expr = r#"(7.0/8.0-5.0%(6.4*3.0))-7.0 == -11.125"#.to_string();
     let mut reporter = StderrReporter::new();
     let mut l = Lexer::new(expr.clone(), &mut reporter);
     l.scan_tokens().unwrap();

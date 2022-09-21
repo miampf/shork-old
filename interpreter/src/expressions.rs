@@ -277,7 +277,7 @@ impl Shl for ShorkExprEvalResult{
                 }
             },
             _ => {
-                res = Self::error(format!("Unsupported Operation '|' on {} and {}", self.get_type_string(), rhs.get_type_string()))
+                res = Self::error(format!("Unsupported Operation '<<' on {} and {}", self.get_type_string(), rhs.get_type_string()))
             }
         }
 
@@ -511,14 +511,7 @@ impl ExprEvaluator{
         let r = tree.get(n)?.clone();
         let mut res;
 
-        let siblings;
-        if r.parent().is_some(){
-            siblings = tree.siblings(&r)?.len();
-        } else {
-            siblings = 0;
-        }
-
-        if self.match_t(r.val(), vec![Minus, Plus]) && (siblings == 2 || r.val().token_type() == &Plus){
+        if self.match_t(r.val(), vec![Minus, Plus]) && r.children().len() == 2{
             // we have a bitwise statement
             let childs = r.children();
             let left = self.equality(tree, childs[0])?;
@@ -594,7 +587,7 @@ impl ExprEvaluator{
         let mut res;
 
         if self.match_t(r.val(), vec![Exclamation, Minus]){
-            let right = self.equality(tree, n)?;
+            let right = self.equality(tree, r.children()[0])?;
             res = match r.val().token_type(){
                 Exclamation => Ok(!right),
                 Minus => Ok(-right),
