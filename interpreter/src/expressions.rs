@@ -142,13 +142,19 @@ impl Div for ShorkExprEvalResult{
         match self.r_type{
             1 => {
                 if self.v_i.is_some() && rhs.get_isize().is_some(){
-                    return Self::integer(self.v_i.unwrap() / rhs.get_isize().unwrap())
+                    if rhs.get_isize().unwrap() != 0{
+                        return Self::integer(self.v_i.unwrap() / rhs.get_isize().unwrap())
+                    }
+                    return Self::error("Attempt to divide by zero".to_string())
                 }
                 Self::error("None value in integer type. This is an error in the interpreter and not in your code".to_string())
             },
             2 => {
                 if self.v_f.is_some() && rhs.get_float().is_some(){
-                    return Self::float(self.v_f.unwrap() / rhs.get_float().unwrap())
+                    if rhs.get_float().unwrap() != 0.0{
+                        return Self::float(self.v_f.unwrap() / rhs.get_float().unwrap())
+                    }
+                    return Self::error("Attempt to divide by zero".to_string())
                 }
                 Self::error("None value in float type. This is an error in the interpreter and not in your code".to_string())
             },
