@@ -31,10 +31,11 @@ fn main() -> Result<(), std::io::Error>{
         let res = interpreter.evaluate(&mut tree);
     
         if res.is_err(){
-            reporter.display_error(res.unwrap_err());
-            return Err(std::io::Error::last_os_error());
+            reporter.display_error(res.clone().unwrap_err());
+            println!();
+        } else {
+            println!("{}", res.unwrap())
         }
     
-        println!("{}", res.unwrap())
     }
 }
