@@ -31,37 +31,10 @@ impl<'a> ExprParser<'a>{
     /// parse equality expressions
     fn equality(&mut self) -> AST{
         // get the left side of the tree
-        let mut tree = self.bitwise();
+        let mut tree = self.comparison();
         
         // is there a != or a ==?
         while self.match_token(vec![ExclamationEqual, EqualEqual]){
-            self.id_offset += 1;
-
-            let operator = self.previous();
-            let mut n = Node::new(self.id_offset, operator, None, vec![]);
-            self.bitwise().clone_into_tree(&mut tree); // add the right side
-            
-            // make the operator the root node for everyone
-            for c in tree.root(){
-                n.add_child(c);
-            }
-            tree.set_root_all(n.id());
-            tree.add(n.clone());
-        }
-
-        tree
-    }
-
-    /// parse bitwise expressions
-    fn bitwise(&mut self) -> AST{
-        // get the left side of the tree
-        let mut tree = self.comparison();
-        
-        // is there a |, &, << or >>?
-        while self.match_token(vec![Pipe, And, LesserLesser, GreaterGreater]){
-            // check for unexpected tokens
-            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
-
             self.id_offset += 1;
 
             let operator = self.previous();
@@ -78,14 +51,41 @@ impl<'a> ExprParser<'a>{
 
         tree
     }
-
+    
     /// parse comparisons
     fn comparison(&mut self) -> AST{
         // get the left side of the tree
-        let mut tree = self.term();
+        let mut tree = self.bitwise();
         
         // is there a >, >=, < or <=?
         while self.match_token(vec![Greater, GreaterEqual, Lesser, LesserEqual]){
+            // check for unexpected tokens
+            self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
+
+            self.id_offset += 1;
+
+            let operator = self.previous();
+            let mut n = Node::new(self.id_offset, operator, None, vec![]);
+            self.bitwise().clone_into_tree(&mut tree); // add the right side
+            
+            // make the operator the root node for everyone
+            for c in tree.root(){
+                n.add_child(c);
+            }
+            tree.set_root_all(n.id());
+            tree.add(n.clone());
+        }
+        
+        tree
+    }
+    
+    /// parse bitwise expressions
+    fn bitwise(&mut self) -> AST{
+        // get the left side of the tree
+        let mut tree = self.term();
+        
+        // is there a |, &, << or >>?
+        while self.match_token(vec![Pipe, And, LesserLesser, GreaterGreater]){
             // check for unexpected tokens
             self.check_error(vec![LeftParen, Exclamation, Minus, IntegerType, FloatType], format!("Expected number, found {:?}", self.peek().token_type()));
 
