@@ -1,4 +1,5 @@
 use std::num::{ParseIntError, ParseFloatError};
+use substring::Substring;
 
 use shork_error::report;
 use crate::tokens;
@@ -29,7 +30,7 @@ impl<'a> Lexer<'a>{
     /// the tokens vector
     pub fn scan_tokens(&mut self) -> Result<(), shork_error::ShorkError>{
         // execute until we have consumed the whole source string
-        while !(self.current >= self.source.len()) {
+        while !(self.current >= self.source.chars().count()) {
             self.start = self.current;
 
             let t = self.get_current_token()?;
@@ -144,7 +145,7 @@ impl<'a> Lexer<'a>{
 
                 let ch = self.peek_behind()?;
                 let mut is_important = false;
-                if ch.is_alphabetic() || ch.is_digit(10) || ch == ']' || ch == ')' || ch == '_' || ch == '#'{
+                if ch.is_alphabetic() || ch.is_digit(10) || ch == ']' || ch == ')' || ch == '_' || ch == '#' || ch == '"' || ch == '\''{
                     is_important = true
                 }
 
@@ -233,7 +234,7 @@ impl<'a> Lexer<'a>{
 
         if t_type.is_some(){
             let t_type = t_type.unwrap();
-            let mut raw_string = self.source[self.start..self.current].to_string();
+            let mut raw_string = self.source.as_str().substring(self.start, self.current).to_string();
 
             if t_type == StringType{
                 // we can safely unwrap here (hopefully)
@@ -378,6 +379,7 @@ impl<'a> Lexer<'a>{
     fn advance(&mut self) -> Result<char, shork_error::ShorkError>{
         self.current += 1;
         let ch = self.source.chars().nth(self.current-1);
+        
         if ch.is_some(){
             return Ok(ch.unwrap())
         }
