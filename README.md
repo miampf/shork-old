@@ -4,7 +4,7 @@ A fishy try on interpreted programming languages and a tribute to the all loved 
 
 ## What works atm?
 
-Nothing because I didn't start coding yet.
+- Expressions - congratulations, you have a calculator!
 
 ## Learn to wield the power of the shonk
 
