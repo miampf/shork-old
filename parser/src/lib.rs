@@ -1,5 +1,5 @@
-pub mod tree;
 pub mod expressions;
+pub mod tree;
 
 #[cfg(test)]
 mod tests {
@@ -12,15 +12,45 @@ mod tests {
 
         // array is unsorted to test search
         let nodes = [
-            Node::new(2, Token::new(TokenType::And, 0, 0, vec![0]), Some(0), vec![4, 5]),
-            Node::new(5, Token::new(TokenType::And, 0, 0, vec![0]), Some(2), vec![]),
-            Node::new(3, Token::new(TokenType::And, 0, 0, vec![0]), Some(0), vec![4, 5]),
-            Node::new(0, Token::new(TokenType::And, 0, 0, vec![0]), None, vec![1, 2, 3]),
-            Node::new(1, Token::new(TokenType::And, 0, 0, vec![0]), Some(0), vec![4, 5]),
-            Node::new(4, Token::new(TokenType::And, 0, 0, vec![0]), Some(2), vec![]),
-            ];
-            
-        for n in nodes.clone(){
+            Node::new(
+                2,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                Some(0),
+                vec![4, 5],
+            ),
+            Node::new(
+                5,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                Some(2),
+                vec![],
+            ),
+            Node::new(
+                3,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                Some(0),
+                vec![4, 5],
+            ),
+            Node::new(
+                0,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                None,
+                vec![1, 2, 3],
+            ),
+            Node::new(
+                1,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                Some(0),
+                vec![4, 5],
+            ),
+            Node::new(
+                4,
+                Token::new(TokenType::And, 0, 0, vec![0]),
+                Some(2),
+                vec![],
+            ),
+        ];
+
+        for n in nodes.clone() {
             ast.add(n)
         }
 

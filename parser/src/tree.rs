@@ -1,24 +1,24 @@
+use shork_error::{ErrorType, ShorkError};
 use shork_lexer::tokens::Token;
-use shork_error::{ShorkError, ErrorType};
 
 /// Represents an Abstract Syntax Tree
 #[derive(Debug, Clone, PartialEq)]
-pub struct AST{
-    arena: Vec<Node>
+pub struct AST {
+    arena: Vec<Node>,
 }
 
 /// A node with an ID
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
-pub struct Node{
+pub struct Node {
     id: usize,
     val: Token,
     parent: Option<usize>,
-    children: Vec<usize>
+    children: Vec<usize>,
 }
 
-impl AST{
+impl AST {
     /// create a new AST
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         Self { arena: Vec::new() }
     }
 
@@ -29,24 +29,24 @@ impl AST{
 
     /// add all nodes of this tree to another tree
     pub fn clone_into_tree(&self, other: &mut Self) {
-        for n in self.arena.clone(){
+        for n in self.arena.clone() {
             other.add(n)
         }
     }
 
     /// give all current root nodes the given id as a root
     pub fn set_root_all(&mut self, root_id: usize) {
-        for cr in self.root(){
+        for cr in self.root() {
             let n = self.get_mut(cr).unwrap(); // unwrap should be safe
             n.set_parent(Some(root_id))
         }
     }
 
     /// get a node from an id
-    pub fn get(&mut self, id: usize) -> Result<&Node, ShorkError>{
+    pub fn get(&mut self, id: usize) -> Result<&Node, ShorkError> {
         self.arena.sort();
         let index = self.arena.binary_search_by_key(&id, |n| n.id);
-        if index.is_err(){
+        if index.is_err() {
             return Err(
                 ShorkError::generate_error(ErrorType::ParserError, 0, "".to_string(), "Failed to find Node in AST. This is an error by the interpreter and not in your source code".to_string())
             );
@@ -56,10 +56,10 @@ impl AST{
     }
 
     /// get a mutable node from an id
-    pub fn get_mut(&mut self, id: usize) -> Result<&mut Node, ShorkError>{
+    pub fn get_mut(&mut self, id: usize) -> Result<&mut Node, ShorkError> {
         self.arena.sort();
         let index = self.arena.binary_search_by_key(&id, |n| n.id);
-        if index.is_err(){
+        if index.is_err() {
             return Err(
                 ShorkError::generate_error(ErrorType::ParserError, 0, "".to_string(), "Failed to find Node in AST. This is an error by the interpreter and not in your source code".to_string())
             );
@@ -68,9 +68,9 @@ impl AST{
     }
 
     /// get the siblings of a node. Includes the node itself
-    pub fn siblings(&mut self, n: &Node) -> Result<Vec<usize>, ShorkError>{
+    pub fn siblings(&mut self, n: &Node) -> Result<Vec<usize>, ShorkError> {
         let p = n.parent();
-        if p.is_none(){
+        if p.is_none() {
             let e = ShorkError::generate_error(ErrorType::ParserError, 0, "".to_string(), "Requested node siblings on root node. This is an error by the interpreter and not in your source code".to_string());
             return Err(e);
         }
@@ -80,10 +80,10 @@ impl AST{
     }
 
     /// get the root node(s)
-    pub fn root(&self) -> Vec<usize>{
+    pub fn root(&self) -> Vec<usize> {
         let mut n_vec = Vec::new();
-        for n in &self.arena{
-            if n.parent().is_none(){
+        for n in &self.arena {
+            if n.parent().is_none() {
                 n_vec.push(n.id())
             }
         }
@@ -93,11 +93,11 @@ impl AST{
 
     /// print the tree
     pub fn print(&mut self) {
-        use ptree::{print_tree_with, Color, PrintConfig, Style, print_config};
+        use ptree::{print_config, print_tree_with, Color, PrintConfig, Style};
 
         let config = {
             let mut config = PrintConfig::default();
-            if std::env::var("NO_COLOR").is_ok(){
+            if std::env::var("NO_COLOR").is_ok() {
                 config.branch = Style::default();
                 config.leaf = Style::default();
                 config.characters = print_config::ASCII_CHARS_TICK.into();
@@ -120,25 +120,30 @@ impl AST{
 
         let mut parena = Vec::new();
 
-        for n in self.arena.clone(){
+        for n in self.arena.clone() {
             parena.push(n.clone())
         }
 
-        for n_id in self.root(){
+        for n_id in self.root() {
             let n = self.get(n_id).expect("Failed to get node from id");
-            let n_print = NodePrinter{
+            let n_print = NodePrinter {
                 node: n.clone(),
-                arena: parena.clone()
+                arena: parena.clone(),
             };
             print_tree_with(&n_print, &config).expect("Failed to print tree");
         }
     }
 }
 
-impl Node{
+impl Node {
     /// create a new node
-    pub fn new(id: usize, val: Token, parent: Option<usize>, children: Vec<usize>) -> Self{
-        Self { id, val, parent, children}
+    pub fn new(id: usize, val: Token, parent: Option<usize>, children: Vec<usize>) -> Self {
+        Self {
+            id,
+            val,
+            parent,
+            children,
+        }
     }
 
     /// set the parent
@@ -152,12 +157,12 @@ impl Node{
     }
 
     /// get the nodes value
-    pub fn val(&self) -> &Token{
+    pub fn val(&self) -> &Token {
         &self.val
     }
 
     /// get the nodes ID
-    pub fn id(&self) -> usize{
+    pub fn id(&self) -> usize {
         self.id
     }
 
@@ -167,50 +172,59 @@ impl Node{
     }
 
     /// get the nodes children
-    pub fn children(&self) -> &Vec<usize>{
+    pub fn children(&self) -> &Vec<usize> {
         &self.children
     }
 }
 
-impl Ord for Node{
+impl Ord for Node {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.id.cmp(&other.id)
     }
 }
 
 #[derive(Debug, Clone)]
-struct NodePrinter{
+struct NodePrinter {
     node: Node,
-    arena: Vec<Node>
+    arena: Vec<Node>,
 }
 
-impl ptree::TreeItem for NodePrinter{
+impl ptree::TreeItem for NodePrinter {
     type Child = Self;
 
-    fn write_self<W: std::io::Write>(&self, f: &mut W, style: &ptree::Style) -> std::io::Result<()> {
+    fn write_self<W: std::io::Write>(
+        &self,
+        f: &mut W,
+        style: &ptree::Style,
+    ) -> std::io::Result<()> {
         use shork_lexer::tokens::TokenType::*;
 
         let t_type = self.node.val().token_type();
-        let val = match *t_type{
+        let val = match *t_type {
             IntegerType => format!("{}", self.node.val().content_int()),
             FloatType => format!("{}", self.node.val().content_float()),
             CharType => format!("{}", self.node.val().content_char()),
             BooleanType => format!("{}", self.node.val().content_bool()),
-            _ => self.node.val().content_string().unwrap()
+            _ => self.node.val().content_string().unwrap(),
         };
 
-        write!(f, "{} {}", style.paint(format!("{:?}", t_type)), style.paint(format!("{:?}", val)))
+        write!(
+            f,
+            "{} {}",
+            style.paint(format!("{:?}", t_type)),
+            style.paint(format!("{:?}", val))
+        )
     }
 
     fn children(&self) -> std::borrow::Cow<[Self::Child]> {
         let mut c_vec = Vec::new();
 
-        for c in self.node.children(){
-            for n in &self.arena{
-                if n.id() == *c{
+        for c in self.node.children() {
+            for n in &self.arena {
+                if n.id() == *c {
                     let n_print = Self {
                         node: n.clone(),
-                        arena: self.arena.clone()
+                        arena: self.arena.clone(),
                     };
                     c_vec.push(n_print)
                 }
@@ -220,3 +234,4 @@ impl ptree::TreeItem for NodePrinter{
         c_vec.into()
     }
 }
+
