@@ -1,3 +1,5 @@
+<img src="./assets/logo-export.svg"/>
+
 # Shork 🦈
 
 A fishy try on interpreted programming languages and a tribute to the all loved IKEA shorki. Meant to be for easy developement of PoC exploits, but feel free to use it however you want (this also means that I am not responsible for ANYTHING you make with this!)
