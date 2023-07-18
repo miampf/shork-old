@@ -2,6 +2,8 @@
 
 # Shork 🦈
 
+**Note**: This project was archived due to my bad code style and lacking experience in language design :) . I do plan on rewriting this project eventually, maybe even soon, but it'll probably take a while.
+
 A fishy try on interpreted programming languages and a tribute to the all loved IKEA shorki. Meant to be for easy developement of PoC exploits, but feel free to use it however you want (this also means that I am not responsible for ANYTHING you make with this!)
 
 ## What works atm?
